@@ -11,8 +11,9 @@ License:	GPL v2
 Group:		Applications/System
 Source0:	http://download.openvz.org/utils/ploop/%{version}/src/%{name}-%{version}.tar.bz2
 BuildRequires:	libxml2-devel
-Requires:	parted
+BuildRequires:	sed >= 4.0
 Requires:	%{name}-libs = %{version}-%{release}
+Requires:	parted
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -37,17 +38,22 @@ Headers ploop library.
 %prep
 %setup -q
 
+%{__sed} -i -e 's,-O2,%{rpmcflags} %{rpmcppflags},' Makefile.inc
+
 %build
 %{__make} all \
 	V=1 \
+	DEBUG=no \
 	CC="%{__cc}" \
+	LDFLAGS="%{rpmldflags} -L$(pwd)/lib" \
 	LIBDIR=%{_libdir}
 
 %install
 rm -rf $RPM_BUILD_ROOT
 %{__make} install \
-	LIBDIR=%{_libdir} \
+	V=1 \
 	INSTALL="install -p" \
+	LIBDIR=%{_libdir} \
 	DESTDIR=$RPM_BUILD_ROOT
 
 # static not packaged
