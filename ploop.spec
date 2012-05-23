@@ -7,11 +7,12 @@ Summary:	Tools for ploop devices and images
 Summary(pl.UTF-8):	Narzędzia do urządzeń i obrazów ploop
 Name:		ploop
 Version:	1.2
-Release:	0.1
+Release:	0.2
 License:	GPL v2+
 Group:		Applications/System
 Source0:	http://download.openvz.org/utils/ploop/%{version}/src/%{name}-%{version}.tar.bz2
 # Source0-md5:	ae1faffff5aaa4b7ceb794676c294844
+Source1:	60-persistant-storage-%{name}.rules
 URL:		http://wiki.openvz.org/Ploop
 BuildRequires:	libxml2-devel
 BuildRequires:	sed >= 4.0
@@ -82,15 +83,12 @@ rm -rf $RPM_BUILD_ROOT
 	LIBDIR=%{_libdir} \
 	DESTDIR=$RPM_BUILD_ROOT
 
+# install custom udev rules for ploop
+install -d $RPM_BUILD_ROOT/lib/udev/rules.d/
+cp -a %{SOURCE1} $RPM_BUILD_ROOT/lib/udev/rules.d/60-persistant-storage-%{name}.rules
+
 %clean
 rm -rf $RPM_BUILD_ROOT
-
-%triggerin -- udev
-SCRIPT="/lib/udev/rules.d/60-persistent-storage.rules"
-if [ -f $SCRIPT ]; then
-	fgrep 'KERNEL=="ploop*", GOTO="persistent_storage_end"' $SCRIPT > /dev/null 2>&1 ||
-	sed -i -e '1 s/^/KERNEL=="ploop*", GOTO="persistent_storage_end"\n/;' $SCRIPT
-fi
 
 %files
 %defattr(644,root,root,755)
@@ -104,6 +102,7 @@ fi
 %attr(755,root,root) %{_sbindir}/ploop-grow
 %attr(755,root,root) %{_sbindir}/ploop-merge
 %attr(755,root,root) %{_sbindir}/ploop-stat
+%attr(755,root,root) /lib/udev/rules.d/60-persistant-storage-%{name}.rules
 
 %files libs
 %defattr(644,root,root,755)
