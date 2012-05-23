@@ -3,13 +3,16 @@
 #   NO, patch udev to include the change or make new .rule file
 # - should libploop.so be SONAME versioned?
 # - unbashism in *mount tools
-Summary:	ploop tools
+Summary:	Tools for ploop devices and images
+Summary(pl.UTF-8):	Narzędzia do urządzeń i obrazów ploop
 Name:		ploop
 Version:	1.2
 Release:	0.1
-License:	GPL v2
+License:	GPL v2+
 Group:		Applications/System
 Source0:	http://download.openvz.org/utils/ploop/%{version}/src/%{name}-%{version}.tar.bz2
+# Source0-md5:	ae1faffff5aaa4b7ceb794676c294844
+URL:		http://wiki.openvz.org/Ploop
 BuildRequires:	libxml2-devel
 BuildRequires:	sed >= 4.0
 Requires:	%{name}-libs = %{version}-%{release}
@@ -19,21 +22,44 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %description
 This package contains tools to work with ploop devices and images.
 
+%description -l pl.UTF-8
+Ten pakiet zawiera narzędzia do pracy z urządzeniami o obrazami ploop.
+
 %package libs
 Summary:	ploop library
+Summary(pl.UTF-8):	Biblioteka ploop
 Group:		Libraries
 Obsoletes:	ploop-lib
 
 %description libs
 Parallels loopback (ploop) block device API library.
 
+%description libs -l pl.UTF-8
+Biblioteka do obsługi urządzeń blokowych ploop (Parallels loopback).
+
 %package devel
-Summary:	header files for ploop library
+Summary:	Header files for ploop library
+Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki ploop
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
 
 %description devel
-Headers ploop library.
+Header files for ploop library.
+
+%description devel -l pl.UTF-8
+Pliki nagłówkowe biblioteki ploop.
+
+%package static
+Summary:	Static ploop library
+Summary(pl.UTF-8):	Biblioteka statyczna ploop
+Group:		Libraries
+Requires:	%{name}-devel = %{version}-%{release}
+
+%description static
+Static ploop library.
+
+%description static -l pl.UTF-8
+Biblioteka statyczna ploop.
 
 %prep
 %setup -q
@@ -55,9 +81,6 @@ rm -rf $RPM_BUILD_ROOT
 	INSTALL="install -p" \
 	LIBDIR=%{_libdir} \
 	DESTDIR=$RPM_BUILD_ROOT
-
-# static not packaged
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/libploop.a
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -93,3 +116,7 @@ fi
 %{_includedir}/ploop/libploop.h
 %{_includedir}/ploop/ploop1_image.h
 %{_includedir}/ploop/ploop_if.h
+
+%files static
+%defattr(644,root,root,755)
+%{_libdir}/libploop.a
