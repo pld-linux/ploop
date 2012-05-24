@@ -85,7 +85,7 @@ rm -rf $RPM_BUILD_ROOT
 
 # install custom udev rules for ploop
 install -d $RPM_BUILD_ROOT/lib/udev/rules.d/
-cp -a %{SOURCE1} $RPM_BUILD_ROOT/lib/udev/rules.d/60-persistant-storage-%{name}.rules
+cp -a %{SOURCE1} $RPM_BUILD_ROOT/lib/udev/rules.d/60-persistent-storage-%{name}.rules
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -102,7 +102,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_sbindir}/ploop-grow
 %attr(755,root,root) %{_sbindir}/ploop-merge
 %attr(755,root,root) %{_sbindir}/ploop-stat
-%attr(755,root,root) /lib/udev/rules.d/60-persistant-storage-%{name}.rules
+%attr(755,root,root) /lib/udev/rules.d/60-persistent-storage-%{name}.rules
 
 %files libs
 %defattr(644,root,root,755)
