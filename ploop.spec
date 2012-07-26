@@ -98,6 +98,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_sbindir}/ploop-grow
 %attr(755,root,root) %{_sbindir}/ploop-merge
 %attr(755,root,root) %{_sbindir}/ploop-stat
+%{_mandir}/man8/ploop.8*
 
 %files libs
 %defattr(644,root,root,755)
