@@ -6,12 +6,12 @@
 Summary:	Tools for ploop devices and images
 Summary(pl.UTF-8):	Narzędzia do urządzeń i obrazów ploop
 Name:		ploop
-Version:	1.4
+Version:	1.5
 Release:	0.1
 License:	GPL v2+
 Group:		Applications/System
 Source0:	http://download.openvz.org/utils/ploop/%{version}/src/%{name}-%{version}.tar.bz2
-# Source0-md5:	f8ff18050ffad9b44361f36bb29970aa
+# Source0-md5:	2549c359c90e6f4c46455d6d39321349
 URL:		http://wiki.openvz.org/Ploop
 BuildRequires:	libxml2-devel
 BuildRequires:	sed >= 4.0
@@ -65,7 +65,7 @@ Biblioteka statyczna ploop.
 %prep
 %setup -q
 
-%{__sed} -i -e 's,-O2,%{rpmcflags} %{rpmcppflags},' Makefile.inc
+%{__sed} -i -e 's/-O2/%{rpmcflags} %{rpmcppflags}/' Makefile.inc
 
 %build
 %{__make} all \
@@ -98,6 +98,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_sbindir}/ploop-grow
 %attr(755,root,root) %{_sbindir}/ploop-merge
 %attr(755,root,root) %{_sbindir}/ploop-stat
+%{_mandir}/man8/ploop.8*
 
 %files libs
 %defattr(644,root,root,755)
@@ -108,6 +109,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %dir %{_includedir}/ploop
 %{_includedir}/ploop/libploop.h
+%{_includedir}/ploop/dynload.h
 %{_includedir}/ploop/ploop1_image.h
 %{_includedir}/ploop/ploop_if.h
 
