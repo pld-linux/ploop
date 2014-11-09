@@ -1,1 +1,0 @@
-KERNEL=="ploop*", GOTO="persistent_storage_end"
