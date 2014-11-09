@@ -9,7 +9,7 @@ Release:	1
 License:	GPL v2+
 Group:		Applications/System
 Source0:	http://download.openvz.org/utils/ploop/%{version}/src/%{name}-%{version}.tar.bz2
-# Source0-md5:	7c8e5626b8f85b5ecef10508d85ba46b
+# Source0-md5:	1a1bcda7d75945916b23d0236fd0afd8
 URL:		http://wiki.openvz.org/Ploop
 BuildRequires:	libxml2-devel
 BuildRequires:	sed >= 4.0
