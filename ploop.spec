@@ -1,20 +1,20 @@
-# TODO:
-# - should libploop.so be SONAME versioned?
-# - unbashism in *mount tools
 Summary:	Tools for ploop devices and images
 Summary(pl.UTF-8):	Narzędzia do urządzeń i obrazów ploop
 Name:		ploop
-Version:	1.8
+Version:	1.12.1
 Release:	1
 License:	GPL v2+
 Group:		Applications/System
 Source0:	http://download.openvz.org/utils/ploop/%{version}/src/%{name}-%{version}.tar.bz2
-# Source0-md5:	1a1bcda7d75945916b23d0236fd0afd8
+# Source0-md5:	7c8e5626b8f85b5ecef10508d85ba46b
 URL:		http://wiki.openvz.org/Ploop
 BuildRequires:	libxml2-devel
 BuildRequires:	sed >= 4.0
 Requires:	%{name}-libs = %{version}-%{release}
+Requires:	/sbin/modprobe
+Requires:	awk
 Requires:	parted
+Requires:	sed
 Requires:	udev-core >= 1:182-6
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -63,14 +63,15 @@ Biblioteka statyczna ploop.
 %prep
 %setup -q
 
-%{__sed} -i -e 's/-O2/%{rpmcflags} %{rpmcppflags}/' Makefile.inc
-
 %build
+LDFLAGS="%{rpmldflags}" \
+LDLIBS="-lpthread" \
 %{__make} all \
 	V=1 \
-	DEBUG=no \
+	DEBUG= \
 	CC="%{__cc}" \
-	LDFLAGS="%{rpmldflags} -L$(pwd)/lib" \
+	CPPFLAGS="%{rpmcppflags}" \
+	RPM_OPT_FLAGS="%{rpmcflags}" \
 	LIBDIR=%{_libdir}
 
 %install
@@ -84,6 +85,9 @@ rm -rf $RPM_BUILD_ROOT
 %clean
 rm -rf $RPM_BUILD_ROOT
 
+%post	libs -p /sbin/ldconfig
+%postun	libs -p /sbin/ldconfig
+
 %files
 %defattr(644,root,root,755)
 %doc tools/README
@@ -91,22 +95,18 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) /sbin/umount.ploop
 %attr(755,root,root) %{_sbindir}/ploop
 %attr(755,root,root) %{_sbindir}/ploop-balloon
-%attr(755,root,root) %{_sbindir}/ploop-check
-%attr(755,root,root) %{_sbindir}/ploop-copy
-%attr(755,root,root) %{_sbindir}/ploop-fsck
-%attr(755,root,root) %{_sbindir}/ploop-grow
-%attr(755,root,root) %{_sbindir}/ploop-merge
-%attr(755,root,root) %{_sbindir}/ploop-stat
 %{_mandir}/man8/ploop.8*
 %{systemdtmpfilesdir}/ploop.conf
 
 %files libs
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/libploop.so
+%attr(755,root,root) %{_libdir}/libploop.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libploop.so.1
 %dir /var/lock/ploop
 
 %files devel
 %defattr(644,root,root,755)
+%attr(755,root,root) %{_libdir}/libploop.so
 %dir %{_includedir}/ploop
 %{_includedir}/ploop/libploop.h
 %{_includedir}/ploop/dynload.h
