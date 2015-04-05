@@ -1,12 +1,12 @@
 Summary:	Tools for ploop devices and images
 Summary(pl.UTF-8):	Narzędzia do urządzeń i obrazów ploop
 Name:		ploop
-Version:	1.12.1
+Version:	1.12.2
 Release:	1
 License:	GPL v2+
 Group:		Applications/System
 Source0:	http://download.openvz.org/utils/ploop/%{version}/src/%{name}-%{version}.tar.bz2
-# Source0-md5:	7c8e5626b8f85b5ecef10508d85ba46b
+# Source0-md5:	75ddd6a972a531a1555d21572092a69d
 URL:		http://wiki.openvz.org/Ploop
 BuildRequires:	libxml2-devel
 BuildRequires:	sed >= 4.0
