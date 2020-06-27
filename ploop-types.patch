@@ -1,0 +1,249 @@
+--- ploop-8.0.14/lib/dm.c.orig	2020-06-19 13:24:40.000000000 +0200
++++ ploop-8.0.14/lib/dm.c	2020-06-21 20:59:55.705329702 +0200
+@@ -234,7 +234,7 @@
+ 	int rc;
+ 	char m[64];
+ 
+-	snprintf(m, sizeof(m), "resize %lu", size);
++	snprintf(m, sizeof(m), "resize %lld", (long long)size);
+ 	rc = ploop_dm_message(devname, m, NULL);
+ 	if (rc)
+ 		ploop_err(errno, "Cann not resize %s", devname);
+@@ -718,8 +718,8 @@
+ 	fds = alloca(n * sizeof(int));
+ 	p = t;
+ 	e = p + sizeof(t);
+-	p += snprintf(p, e-p, "0 %lu ploop %d %s",
+-			new_size, ffs(blocksize)-1, ldev);
++	p += snprintf(p, e-p, "0 %lld ploop %d %s",
++			(long long)new_size, ffs(blocksize)-1, ldev);
+ 	for (i = 0; i < n-1; i++) {
+ 		ploop_log(0, "Add delta %s (ro)", images[i]);
+ 		fds[i] = open(images[i], O_DIRECT | O_RDONLY);
+--- ploop-8.0.14/lib/check.c.orig	2020-06-19 13:24:40.000000000 +0200
++++ ploop-8.0.14/lib/check.c	2020-06-21 21:05:55.003383218 +0200
+@@ -248,15 +248,15 @@
+ 				return ret;
+ 		}
+ 
+-		ploop_log(0, "Filling hole at start=%lu len=%lu",
+-				(long unsigned)offset, (long unsigned)len);
++		ploop_log(0, "Filling hole at start=%lld len=%lld",
++				(long long)offset, (long long)len);
+ 
+ 		n = pwrite(*fd, buf, len, offset);
+ 		if (n != len) {
+ 			if (n >= 0)
+ 				errno = EIO;
+-			ploop_err(errno, "Failed to write offset=%lu len=%lu",
+-					offset, len);
++			ploop_err(errno, "Failed to write offset=%lld len=%lld",
++					(long long)offset, (long long)len);
+ 			return SYSEXIT_WRITE;
+ 		}
+ 	}
+@@ -282,8 +282,8 @@
+ 		if (id >= rmap_size)
+ 			continue;
+ 		if (offset > data_offset && rmap[id] == PLOOP_ZERO_INDEX) {
+-			ploop_log(0, "Restore the hole at offset=%lu len=%lu ID=%d",
+-					offset, len, id);
++			ploop_log(0, "Restore the hole at offset=%lld len=%lld ID=%d",
++					(long long)offset, (long long)len, id);
+ 			if (*log == 0) {
+ 				*log = 1;
+ 				print_output(0, "filefrag -vs", image);
+@@ -293,8 +293,8 @@
+ 			}
+ 
+ 			if (fallocate(*fd, FALLOC_FL_PUNCH_HOLE|FALLOC_FL_KEEP_SIZE, offset, len) == -1 ) {
+-				ploop_err(errno, "Failed to fallocate offset=%lu len=%lu",
+-						offset, len);
++				ploop_err(errno, "Failed to fallocate offset=%lld len=%lld",
++						(long long)offset, (long long)len);
+ 				return SYSEXIT_WRITE;
+ 			}
+ 		}
+@@ -643,8 +643,8 @@
+ 
+ 	if ((off_t)alloc_head * cluster < stb.st_size) {
+ 		if (!ro) {
+-			ploop_log(0, "Max cluster: %d (image size %lu) trimming tail",
+-					alloc_head, stb.st_size);
++			ploop_log(0, "Max cluster: %d (image size %llu) trimming tail",
++					alloc_head, (unsigned long long)stb.st_size);
+ 			if (ftruncate(fd, (off_t)alloc_head * cluster)) {
+ 				ploop_err(errno, "ftruncate");
+ 				ret = SYSEXIT_FTRUNCATE;
+--- ploop-8.0.14/lib/ploop.c.orig	2020-06-19 13:24:40.000000000 +0200
++++ ploop-8.0.14/lib/ploop.c	2020-06-21 21:07:51.186087135 +0200
+@@ -227,7 +227,7 @@
+ 		return 0;
+ 	if (res >= 0)
+ 		errno = EIO;
+-	ploop_err(errno, "pread off=%lu size=%d", off, size);
++	ploop_err(errno, "pread off=%lld size=%d", (long long)off, size);
+ 
+ 	return -1;
+ }
+@@ -584,7 +584,7 @@
+ 
+ 	if (size_sec == 0) {
+ 		ploop_err(0, "Incorrect block device size specified: "
+-				"%lu sectors", (long)size_sec);
++				"%lld sectors", (long long)size_sec);
+ 		return SYSEXIT_PARAM;
+ 	}
+ 
+@@ -2662,7 +2662,7 @@
+ 	if (ret)
+ 		return ret;
+ 
+-	ploop_log(0, "Truncate %s %lu",	di->images[0]->file, S2B(new_end));
++	ploop_log(0, "Truncate %s %lld", di->images[0]->file, (long long)S2B(new_end));
+ 	if (truncate(di->images[0]->file, S2B(new_end))) {
+ 		ploop_err(errno, "Failed to truncate %s",
+ 				di->images[0]->file);
+--- ploop-8.0.14/lib/fsutils.c.orig	2020-06-19 13:24:40.000000000 +0200
++++ ploop-8.0.14/lib/fsutils.c	2020-06-21 21:08:15.102624235 +0200
+@@ -79,7 +79,7 @@
+ 
+ 	snprintf(partname, sizeof(partname), "%sp1",
+ 			get_basename(devname));
+-	snprintf(t, sizeof(t), "0 %lu linear %s 2048", size, devname);
++	snprintf(t, sizeof(t), "0 %lld linear %s 2048", (long long)size, devname);
+ 
+ 	return run_prg(a);
+ }
+--- ploop-8.0.14/lib/ploop-copy.c.orig	2020-06-19 13:24:40.000000000 +0200
++++ ploop-8.0.14/lib/ploop-copy.c	2020-06-21 21:08:46.532453965 +0200
+@@ -490,8 +490,8 @@
+ 	if (h->stage == PLOOP_COPY_START &&
+ 			(pos % (__u64)h->cluster) == 0 && (n % (size_t)h->cluster) == 0 &&
+ 			is_zero_block(iobuf, n)) {
+-		ploop_dbg(4, "Skip zero cluster block at offset %llu size %lu",
+-				pos, n);
++		ploop_dbg(4, "Skip zero cluster block at offset %llu size %lld",
++				pos, (long long)n);
+ 		return 0;
+ 	}
+ 
+--- ploop-8.0.14/lib/cbt.c.orig	2020-06-19 13:24:40.000000000 +0200
++++ ploop-8.0.14/lib/cbt.c	2020-06-22 22:09:31.217973374 +0200
+@@ -149,7 +149,7 @@
+ 
+ 		for (p = raw->m_L1; p < raw->m_L1 + raw->m_L1Size; ++p) {
+ 			if (*p > 1)
+-				free((void *) *p);
++				free((void *)(intptr_t) *p);
+ 		}
+ 	}
+ 
+@@ -623,7 +623,7 @@
+ 		} else {
+ 			*p = offset / SECTOR_SIZE;
+ 			/// TODO: truncate instead of less write (blk size to cur_size)
+-			if (PWRITE(delta, (void *)*in_p, block_size, offset)) {
++			if (PWRITE(delta, (void *)(intptr_t)*in_p, block_size, offset)) {
+ 				ploop_err(errno, "Can't write dirty_bitmap block");
+ 				return SYSEXIT_WRITE;
+ 			}
+@@ -752,7 +752,7 @@
+ 				goto err;
+ 			}
+ 
+-			*p = (__u64)block;
++			*p = (__u64)(intptr_t)block;
+ 		}
+ 	}
+ 
+@@ -887,9 +887,9 @@
+ 				goto out;
+ 		} else {
+ 			if ((ret = cbt_set_dirty_bitmap_part(
+-					devfd, raw->m_Id, (void *)*p, cur_size * 8, offset * 8, byte_granularity)))
++					devfd, raw->m_Id, (void *)(intptr_t)*p, cur_size * 8, offset * 8, byte_granularity)))
+ 				goto out;
+-			free((void *)*p);
++			free((void *)(intptr_t)*p);
+ 			*p = 0;
+ 		}
+ 	}
+@@ -931,7 +931,7 @@
+ 	if (PREAD(delta, block, block_size, vh->m_FormatExtensionOffset * SECTOR_SIZE)) {
+ 		ploop_err(errno,  "Can't read optional header block, "
+ 				  "offset: 0x%llx, size: 0x%lx",
+-				  vh->m_FormatExtensionOffset, block_size);
++				  vh->m_FormatExtensionOffset, (long)block_size);
+ 		ret = SYSEXIT_READ;
+ 		goto drop_optional_hdr;
+ 	}
+@@ -1132,7 +1132,7 @@
+ 		if (*p == 1)
+ 			printf("1\n");
+ 		else
+-			dump_L1(p -  ctx->raw->m_L1, (__u64 *)*p, cur_size / sizeof(__u64));
++			dump_L1(p -  ctx->raw->m_L1, (__u64 *)(intptr_t)*p, cur_size / sizeof(__u64));
+ 	}
+ }
+ 
+@@ -1199,7 +1199,7 @@
+ 		if (is_const_bit(block, cur_size, (int *)p))
+ 			continue;
+ 
+-		*p = (__u64)block;
++		*p = (__u64)(intptr_t)block;
+ 		block = NULL;
+ 	 }
+ 
+@@ -1575,7 +1575,7 @@
+ 
+ 	for (i = 0; i < bmap->l1_size; ++i) {
+ 		if (bmap->map[i] > 1)
+-			free((void *)bmap->map[i]);
++			free((void *)(intptr_t)bmap->map[i]);
+ 	}
+ 
+ 	free(bmap);
+@@ -1632,7 +1632,7 @@
+ 			}
+ 
+ 			pid = clu / clu_per_block;
+-			bmap->map[pid] = (__u64)block;
++			bmap->map[pid] = (__u64)(intptr_t)block;
+ 			block = NULL;
+ 		}
+ 
+@@ -1640,7 +1640,7 @@
+ 			continue;
+ 
+ 		__u32 x = clu % clu_per_block; 
+-		BMAP_SET((void *)bmap->map[pid], x);
++		BMAP_SET((void *)(intptr_t)bmap->map[pid], x);
+ 	}
+ 
+ out:
+--- ploop-8.0.14/lib/defrag.c.orig	2020-06-19 13:24:40.000000000 +0200
++++ ploop-8.0.14/lib/defrag.c	2020-06-22 22:11:18.690724478 +0200
+@@ -47,8 +47,8 @@
+ {
+ 	off_t off = sizeof(struct ploop_pvd_header) + (clu * sizeof(__u32));
+ 
+-	ploop_log(0, "Update BAT cluster: %d off: %lu %d->%d",
+-			clu, off, old, new);
++	ploop_log(0, "Update BAT cluster: %d off: %lld %d->%d",
++			clu, (long long)off, old, new);
+ 	new <<= ploop_fmt_log(delta->version);
+ 	return write_safe(delta->fd, &new, sizeof(new), off,
+ 			"Cannot update BAT");
+@@ -65,8 +65,8 @@
+ 	s = (off_t)src * cluster;
+ 	d = (off_t)dst * cluster;
+ 
+-	ploop_log(0, "Reallocate cluster #%d data from %u/off: %lu to %u/off: %lu",
+-			clu, src, s, dst, d);
++	ploop_log(0, "Reallocate cluster #%d data from %u/off: %lld to %u/off: %lld",
++			clu, src, (long long)s, dst, (long long)d);
+ 	while (len) {
+ 		int r = copy_file_range(delta->fd, &s, delta->fd, &d, len, 0);
+ 		if (r <= 0) {

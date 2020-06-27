@@ -1,14 +1,19 @@
 Summary:	Tools for ploop devices and images
 Summary(pl.UTF-8):	Narzędzia do urządzeń i obrazów ploop
 Name:		ploop
-Version:	1.12.2
+Version:	8.0.14
 Release:	1
 License:	GPL v2+
 Group:		Applications/System
-Source0:	http://download.openvz.org/utils/ploop/%{version}/src/%{name}-%{version}.tar.bz2
-# Source0-md5:	75ddd6a972a531a1555d21572092a69d
-URL:		http://wiki.openvz.org/Ploop
-BuildRequires:	libxml2-devel
+#Source0Download: https://github.com/OpenVZ/ploop/releases
+Source0:	https://github.com/OpenVZ/ploop/archive/v%{version}/%{name}-%{version}.tar.gz
+# Source0-md5:	76bc12dd67ed9201d02bc156fbb6a17a
+Patch0:		%{name}-types.patch
+Patch1:		%{name}-python.patch
+URL:		https://wiki.openvz.org/Ploop
+BuildRequires:	libxml2-devel >= 2.0
+BuildRequires:	python3-devel >= 1:3.2
+BuildRequires:	rpmbuild(macros) >= 1.673
 BuildRequires:	sed >= 4.0
 Requires:	%{name}-libs = %{version}-%{release}
 Requires:	/sbin/modprobe
@@ -23,6 +28,19 @@ This package contains tools to work with ploop devices and images.
 
 %description -l pl.UTF-8
 Ten pakiet zawiera narzędzia do pracy z urządzeniami o obrazami ploop.
+
+%package -n bash-completion-ploop
+Summary:	Bash completion for ploop commands
+Summary(pl.UTF-8):	Bashowe dopełnianie składni poleceń ploop
+Group:		Applications/Shells
+Requires:	%{name} = %{version}-%{release}
+Requires:	bash-completion >= 2.0
+
+%description -n bash-completion-ploop
+Bash completion for ploop commands.
+
+%description -n bash-completion-ploop -l pl.UTF-8
+Bashowe dopełnianie składni poleceń ploop.
 
 %package libs
 Summary:	ploop library
@@ -60,8 +78,28 @@ Static ploop library.
 %description static -l pl.UTF-8
 Biblioteka statyczna ploop.
 
+%package -n python3-libploop
+Summary:	Python 3 interface to ploop library
+Summary(pl.UTF-8):	Interfejs Pythona 3 do biblioteki ploop
+Group:		Libraries/Python
+Requires:	%{name} = %{version}-%{release}
+
+%description -n python3-libploop
+Python 3 interface to ploop library.
+
+%description -n python3-libploop -l pl.UTF-8
+Interfejs Pythona 3 do biblioteki ploop.
+
 %prep
 %setup -q
+%patch0 -p1
+%patch1 -p1
+
+# honour %{_libexecdir} whatever it's set to
+%{__sed} -i -e '/exe = / s,/usr/libexec,%{_libexecdir},' scripts/crypthelper
+%{__sed} -i -e '/define CRYPT_BIN/ s,/usr/libexec,%{_libexecdir},' lib/crypt.c
+# drop /usr/libexec/{tune,resize,dumpe}2fs from tools search
+%{__sed} -i -e '/\/usr\/libexec\/.*2fs/d' lib/fsutils.c
 
 %build
 LDFLAGS="%{rpmldflags}" \
@@ -76,11 +114,20 @@ LDLIBS="-lpthread" \
 
 %install
 rm -rf $RPM_BUILD_ROOT
+
 %{__make} install \
 	V=1 \
 	INSTALL="install -p" \
+	COMPLETIONDIR=%{bash_compdir} \
 	LIBDIR=%{_libdir} \
+	LIBSCRIPTDIR=%{_libexecdir}/ploop \
 	DESTDIR=$RPM_BUILD_ROOT
+
+%{__rm} $RPM_BUILD_ROOT%{_sbindir}/ploop-test
+%{__rm} -r $RPM_BUILD_ROOT/usr/libexec/ploop-test
+
+%py3_comp $RPM_BUILD_ROOT%{py3_sitedir}
+%py3_ocomp $RPM_BUILD_ROOT%{py3_sitedir}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -95,24 +142,39 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) /sbin/umount.ploop
 %attr(755,root,root) %{_sbindir}/ploop
 %attr(755,root,root) %{_sbindir}/ploop-balloon
-%{_mandir}/man8/ploop.8*
+%attr(755,root,root) %{_sbindir}/ploop-cbt
+%attr(755,root,root) %{_sbindir}/ploop-volume
+%dir %{_libexecdir}/ploop
+%attr(755,root,root) %{_libexecdir}/ploop/crypthelper
+/etc/modules-load.d/ploop.conf
+%dir /var/lock/ploop
 %{systemdtmpfilesdir}/ploop.conf
+%{_mandir}/man8/ploop.8*
+
+%files -n bash-completion-ploop
+%defattr(644,root,root,755)
+%{bash_compdir}/ploop
 
 %files libs
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libploop.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libploop.so.1
+%attr(755,root,root) %ghost %{_libdir}/libploop.so.8
 %dir /var/lock/ploop
 
 %files devel
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libploop.so
-%dir %{_includedir}/ploop
-%{_includedir}/ploop/libploop.h
-%{_includedir}/ploop/dynload.h
-%{_includedir}/ploop/ploop1_image.h
-%{_includedir}/ploop/ploop_if.h
+%{_includedir}/ploop
+%{_pkgconfigdir}/ploop.pc
 
 %files static
 %defattr(644,root,root,755)
 %{_libdir}/libploop.a
+
+%files -n python3-libploop
+%defattr(644,root,root,755)
+%dir %{py3_sitedir}/libploop
+%attr(755,root,root) %{py3_sitedir}/libploop/libploopapi.cpython-*.so
+%{py3_sitedir}/libploop/__init__.py
+%{py3_sitedir}/libploop/__pycache__
+%{py3_sitedir}/libploop-0.0.0-py*.egg-info
