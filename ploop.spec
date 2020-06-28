@@ -10,6 +10,7 @@ Source0:	https://github.com/OpenVZ/ploop/archive/v%{version}/%{name}-%{version}.
 # Source0-md5:	76bc12dd67ed9201d02bc156fbb6a17a
 Patch0:		%{name}-types.patch
 Patch1:		%{name}-python.patch
+Patch2:		%{name}-gcc.patch
 URL:		https://wiki.openvz.org/Ploop
 BuildRequires:	libxml2-devel >= 2.0
 BuildRequires:	python3-devel >= 1:3.2
@@ -94,6 +95,7 @@ Interfejs Pythona 3 do biblioteki ploop.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 # honour %{_libexecdir} whatever it's set to
 %{__sed} -i -e '/exe = / s,/usr/libexec,%{_libexecdir},' scripts/crypthelper
