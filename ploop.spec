@@ -1,16 +1,15 @@
 Summary:	Tools for ploop devices and images
 Summary(pl.UTF-8):	Narzędzia do urządzeń i obrazów ploop
 Name:		ploop
-Version:	8.0.14
-Release:	2
+Version:	8.0.55
+Release:	1
 License:	GPL v2+
 Group:		Applications/System
 #Source0Download: https://github.com/OpenVZ/ploop/releases
 Source0:	https://github.com/OpenVZ/ploop/archive/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	76bc12dd67ed9201d02bc156fbb6a17a
-Patch0:		%{name}-types.patch
-Patch1:		%{name}-python.patch
-Patch2:		%{name}-gcc.patch
+# Source0-md5:	02b49c7cc117d3181e1cd109a34d3afc
+Patch0:		%{name}-python.patch
+Patch1:		no-Werror.patch
 URL:		https://wiki.openvz.org/Ploop
 BuildRequires:	libxml2-devel >= 2.0
 BuildRequires:	python3-devel >= 1:3.2
@@ -95,7 +94,6 @@ Interfejs Pythona 3 do biblioteki ploop.
 %setup -q
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
 
 # honour %{_libexecdir} whatever it's set to
 %{__sed} -i -e '/exe = / s,/usr/libexec,%{_libexecdir},' scripts/crypthelper
@@ -146,6 +144,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_sbindir}/ploop-balloon
 %attr(755,root,root) %{_sbindir}/ploop-cbt
 %attr(755,root,root) %{_sbindir}/ploop-volume
+%attr(755,root,root) %{_sbindir}/ploop-e4defrag
 %dir %{_libexecdir}/ploop
 %attr(755,root,root) %{_libexecdir}/ploop/crypthelper
 /etc/modules-load.d/ploop.conf

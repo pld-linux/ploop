@@ -1,0 +1,11 @@
+--- ploop-8.0.55/Makefile.inc~	2021-07-30 15:50:27.000000000 +0200
++++ ploop-8.0.55/Makefile.inc	2021-10-14 21:13:59.483057578 +0200
+@@ -36,7 +36,7 @@
+ 
+ CFLAGS := $(if $(DEBUG),-g -O0 -DDEBUG,-O2) $(CFLAGS)
+ CFLAGS += -I. -I../include -fno-strict-aliasing \
+-	-Wall -Wstrict-prototypes -Werror -Wformat-security -Werror=format-truncation=0 \
++	-Wall -Wstrict-prototypes -Wformat-security -Werror=format-truncation=0 \
+ 	-D_GNU_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 \
+ 	-DPRODUCT_NAME_SHORT=\"$(PRODUCT_NAME_SHORT)\"
+ CFLAGS += $(RPM_OPT_FLAGS) $(CPPFLAGS)
