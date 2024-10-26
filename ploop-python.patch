@@ -8,17 +8,3 @@
 +	$(Q) CFLAGS= python3 setup.py install --prefix=/usr --optimize=2 \
  		$(if $(DESTDIR), --root $(DESTDIR))
  .PHONY: install
---- ploop-8.0.14/python/libploop/__init__.py.orig	2020-06-19 13:24:40.000000000 +0200
-+++ ploop-8.0.14/python/libploop/__init__.py	2020-06-27 18:12:33.487985985 +0200
-@@ -2,9 +2,9 @@
- import threading
- 
- class ploopcopy():
--	def __init__(self, ddxml, fd, async = 0):
-+	def __init__(self, ddxml, fd, _async = 0):
- 		self.di = libploopapi.open_dd(ddxml)
--		self.h = libploopapi.copy_init(self.di, fd, async)
-+		self.h = libploopapi.copy_init(self.di, fd, _async)
- 
- 	def __del__(self):
- 		if self.h:

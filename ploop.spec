@@ -1,16 +1,18 @@
 Summary:	Tools for ploop devices and images
 Summary(pl.UTF-8):	Narzędzia do urządzeń i obrazów ploop
 Name:		ploop
-Version:	8.0.55
-Release:	2
+Version:	8.0.99
+Release:	1
 License:	GPL v2+
 Group:		Applications/System
 #Source0Download: https://github.com/OpenVZ/ploop/releases
 Source0:	https://github.com/OpenVZ/ploop/archive/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	02b49c7cc117d3181e1cd109a34d3afc
+# Source0-md5:	1b6b86193ee29931572583b5912585a8
 Patch0:		%{name}-python.patch
 Patch1:		no-Werror.patch
+Patch2:		%{name}-glibc.patch
 URL:		https://wiki.openvz.org/Ploop
+BuildRequires:	glibc-devel >= 6:2.36
 BuildRequires:	libxml2-devel >= 2.0
 BuildRequires:	python3-devel >= 1:3.2
 BuildRequires:	rpmbuild(macros) >= 1.673
@@ -46,7 +48,7 @@ Bashowe dopełnianie składni poleceń ploop.
 Summary:	ploop library
 Summary(pl.UTF-8):	Biblioteka ploop
 Group:		Libraries
-Obsoletes:	ploop-lib
+Obsoletes:	ploop-lib < 1.4
 
 %description libs
 Parallels loopback (ploop) block device API library.
@@ -94,6 +96,7 @@ Interfejs Pythona 3 do biblioteki ploop.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 # honour %{_libexecdir} whatever it's set to
 %{__sed} -i -e '/exe = / s,/usr/libexec,%{_libexecdir},' scripts/crypthelper
