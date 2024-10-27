@@ -1,19 +1,24 @@
 Summary:	Tools for ploop devices and images
 Summary(pl.UTF-8):	Narzędzia do urządzeń i obrazów ploop
 Name:		ploop
-Version:	8.0.99
+Version:	9.0.30
 Release:	1
 License:	GPL v2+
 Group:		Applications/System
-#Source0Download: https://github.com/OpenVZ/ploop/releases
+#Source0Download: https://github.com/OpenVZ/ploop/tags
 Source0:	https://github.com/OpenVZ/ploop/archive/v%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	1b6b86193ee29931572583b5912585a8
+# Source0-md5:	8d4f8666f2841f0a4a9686c9ef2e338c
 Patch0:		%{name}-python.patch
 Patch1:		no-Werror.patch
 Patch2:		%{name}-glibc.patch
 URL:		https://wiki.openvz.org/Ploop
+BuildRequires:	device-mapper-devel
 BuildRequires:	glibc-devel >= 6:2.36
+BuildRequires:	json-c-devel
+BuildRequires:	libblkid-devel
+BuildRequires:	libuuid-devel
 BuildRequires:	libxml2-devel >= 2.0
+BuildRequires:	openssl-devel
 BuildRequires:	python3-devel >= 1:3.2
 BuildRequires:	rpmbuild(macros) >= 1.673
 BuildRequires:	sed >= 4.0
@@ -61,6 +66,7 @@ Summary:	Header files for ploop library
 Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki ploop
 Group:		Development/Libraries
 Requires:	%{name}-libs = %{version}-%{release}
+Requires:	libxml2-devel >= 2.0
 
 %description devel
 Header files for ploop library.
@@ -162,7 +168,7 @@ rm -rf $RPM_BUILD_ROOT
 %files libs
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libploop.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libploop.so.8
+%attr(755,root,root) %ghost %{_libdir}/libploop.so.9
 %dir /var/lock/ploop
 
 %files devel
