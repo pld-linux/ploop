@@ -2,7 +2,7 @@ Summary:	Tools for ploop devices and images
 Summary(pl.UTF-8):	Narzędzia do urządzeń i obrazów ploop
 Name:		ploop
 Version:	9.0.30
-Release:	2
+Release:	3
 License:	GPL v2+
 Group:		Applications/System
 #Source0Download: https://github.com/OpenVZ/ploop/tags
