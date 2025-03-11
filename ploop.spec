@@ -2,7 +2,7 @@ Summary:	Tools for ploop devices and images
 Summary(pl.UTF-8):	Narzędzia do urządzeń i obrazów ploop
 Name:		ploop
 Version:	9.0.30
-Release:	
+Release:	2
 License:	GPL v2+
 Group:		Applications/System
 #Source0Download: https://github.com/OpenVZ/ploop/tags
@@ -100,9 +100,9 @@ Interfejs Pythona 3 do biblioteki ploop.
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
+%patch -P 0 -p1
+%patch -P 1 -p1
+%patch -P 2 -p1
 
 # honour %{_libexecdir} whatever it's set to
 %{__sed} -i -e '/exe = / s,/usr/libexec,%{_libexecdir},' scripts/crypthelper
